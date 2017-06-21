@@ -6,7 +6,7 @@ export default class User extends Component {
     constructor(props) {
         super(props);
         let query = props.query;
-        let requestUrl = process.env.REACT_APP_SERVICE_HOST + "?model_name=" + query.model_name + "&model_group=" + query.model_group;
+        let requestUrl = process.env.REACT_APP_SERVICE_HOST + "/api/model?model_name=" + query.model_name + "&model_group=" + query.model_group;
         this.state = {
             model_group: '',
             model_name: '',
