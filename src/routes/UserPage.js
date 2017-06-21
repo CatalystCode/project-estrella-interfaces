@@ -6,7 +6,7 @@ import '../styles/global.css';
 export default class UserPage extends Component {
     constructor(props) {
         super(props);
-        this.state = { query: props.location.query };
+        this.state = {query: props.location.query};
     }
 
     render() {
