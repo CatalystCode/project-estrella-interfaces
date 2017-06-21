@@ -29,30 +29,53 @@ export default class UploadComponent extends Component {
         this.state = {
             metadata: {},
             action: 'loaded',
+            model_arguments: []
         };
     }
 
     handleChange(name, event) {
         this.state.metadata[name] = event.target.value;
-    }    
+    }
+
+    addArgument(name, event) {
+        this.state.model_arguments.push({ 'name': '', 'type': '' });
+        this.forceUpdate();
+    }
+
+    removeArgument(name, event) {
+        this.state.model_arguments.pop();
+        this.forceUpdate();
+    }
+
+    updateArgument(id, name, event) {
+        this.state.model_arguments[id][name] = event.target.value;
+    }
 
     fileAdded(file) {
-        this.setState({action: 'loaded'});
-        this.dropzone.updateTotalUploadProgress();        
+        this.setState({ action: 'loaded' });
+        this.dropzone.updateTotalUploadProgress();
     }
 
     initialize(dz) {
         this.dropzone = dz;
         this.dropzone.removeAllFiles(true);
     }
-    
+
     maxFilesExceeded(file) {
         this.dropzone.removeAllFiles();
         this.dropzone.addFile(file);
     }
 
     uploadInterceptor(file, xhr, formData) {
-        xhr.setRequestHeader("metadata", JSON.stringify(this.state.metadata));
+        var modelParameters = {};
+        modelParameters.interval = { 'type': 'integer' };
+        modelParameters.arguments = {};
+        this.state.model_arguments.map(arg => (
+            modelParameters.arguments[arg.name] = { 'type': arg.type }
+        ));
+
+        this.state.metadata.model_parameters = JSON.stringify(modelParameters);
+        xhr.setRequestHeader('metadata', JSON.stringify(this.state.metadata));
     }
 
     uploadCompleted(file, response, ev) {
@@ -61,13 +84,13 @@ export default class UploadComponent extends Component {
         }
 
         this.dropzone.removeAllFiles();
-        this.setState({action: 'processed'});
+        this.setState({ action: 'processed' });
     }
 
     uploadFailed(file, response, ev) {
         this.dropzone.removeAllFiles();
         alert(response["message"]);
-    }    
+    }
 
     handleUpload() {
         if (this.dropzone.files.length == 0) {
@@ -75,7 +98,7 @@ export default class UploadComponent extends Component {
             return;
         }
 
-        this.setState({action: 'processing'});
+        this.setState({ action: 'processing' });
         this.dropzone.processQueue();
     }
 
@@ -90,9 +113,32 @@ export default class UploadComponent extends Component {
             error: this.uploadFailed.bind(this)
         }
 
-        const {action} = this.state;
+        const { action } = this.state;
         const className = action === 'processed' ? 'btn-success' : action === 'failed' ? 'btn-danger' : 'btn-primary';
         const message = action === 'processed' ? 'Model Uploaded' : action === 'failed' ? 'Upload Failed' : 'Upload';
+
+        let modelParams;
+        if (this.state.model_arguments.length == 0) {
+            modelParams = (
+                <p>
+                    Model parameters<button type="button" onClick={this.addArgument.bind(this)}>Add</button><br />
+                </p>
+            )
+        }
+        else {
+            modelParams = (
+                <p>
+                    Model parameters<br />
+                    {this.state.model_arguments.map((arg, id) => (
+                        <div>
+                            Name<input name={arg.name} type={"text"} onChange={this.updateArgument.bind(this, id, 'name')}></input>
+                            Type<input name={arg.type} type={"text"} onChange={this.updateArgument.bind(this, id, 'type')}></input>
+                        </div>))}
+                    <button type="button" onClick={this.addArgument.bind(this)}>Add</button>
+                    <button type="button" onClick={this.removeArgument.bind(this)}>Remove</button>
+                </p>
+            )
+        }
 
         return (
             <div>
@@ -105,7 +151,7 @@ export default class UploadComponent extends Component {
                 Model name: <input type="text" name="model_name" value={this.state.metadata.model_name} onChange={this.handleChange.bind(this, 'model_name')} /><br />
                 Model intervals: <input type="number" name="model_intervals" value={this.state.metadata.model_intervals} onChange={this.handleChange.bind(this, 'model_intervals')} /><br />
                 Model frequency: <input type="text" name="model_frequency" value={this.state.metadata.model_frequency} onChange={this.handleChange.bind(this, 'model_frequency')} /><br />
-                Model parameters: <input type="text" name="model_parameters" onChange={this.handleChange.bind(this, 'model_parameters')} /><br />                
+                {modelParams}
                 <div className="col-lg-12 text-left">
                     <div className="row" style={styles.button}>
                         <button type="button" onClick={this.handleUpload.bind(this)} className={className + " btn"}>
@@ -116,5 +162,5 @@ export default class UploadComponent extends Component {
                 </div>
             </div>
         );
-    }    
+    }
 }
