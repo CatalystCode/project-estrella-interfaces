@@ -9,7 +9,7 @@ export default class PredictionResult extends Component {
         this.state = {
             'url': '',
             'prediction': ''
-        }        
+        }
     }
 
     componentWillReceiveProps(nextProps) {

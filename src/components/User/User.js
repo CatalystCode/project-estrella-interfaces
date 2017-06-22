@@ -5,15 +5,26 @@ import ModelInput from './ModelInput';
 export default class User extends Component {
     constructor(props) {
         super(props);
-        let query = props.query;
-        let requestUrl = process.env.REACT_APP_SERVICE_HOST + "/api/model?model_name=" + query.model_name + "&model_group=" + query.model_group;
         this.state = {
             model_group: '',
             model_name: '',
             model_intervals: 0,
-            model_arguments: []
+            model_arguments: [],
+            url: ''
         };
-        
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        let query = nextProps.query;
+        if (!query.model_name) {
+            return;
+        }
+
+        let requestUrl = process.env.REACT_APP_SERVICE_HOST + "/api/model?model_name=" + query.model_name + "&model_group=" + query.model_group;
+        if (requestUrl === this.state.url) {
+            return;
+        }
+
         request(requestUrl, function (error, response, body) {
             if (response && response.statusCode == 200) {
                 var json = JSON.parse(body);
@@ -28,19 +39,36 @@ export default class User extends Component {
                     }
                 }
 
-                this.setState((prevState) => ({
-                    model_group: model_group,
-                    model_name: model_name,
-                    model_intervals: model_intervals,
-                    model_arguments: model_arguments
-                }));
+                this.state = {
+                    'model_group': model_group,
+                    'model_name': model_name,
+                    'model_intervals': model_intervals,
+                    'model_arguments': model_arguments,
+                    'url': requestUrl
+                };
+
+                this.forceUpdate();
+            }
+            else {
+                this.state = {
+                    model_group: '',
+                    model_name: '',
+                    model_intervals: 0,
+                    model_arguments: [],
+                    url: ''
+                };
             }
         }.bind(this));
     }
 
     render() {
         return (
-            <ModelInput model_group={this.state.model_group} model_name={this.state.model_name} model_intervals={this.state.model_intervals} model_arguments={this.state.model_arguments} />
+            <ModelInput
+                model_group={this.state.model_group}
+                model_name={this.state.model_name}
+                model_intervals={this.state.model_intervals}
+                model_arguments={this.state.model_arguments}
+            />
         )
     }
 }

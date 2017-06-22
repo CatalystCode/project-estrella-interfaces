@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import Admin from '../components/Admin/Admin';
+import UploadComponent from '../components/Admin/UploadComponent';
 
 export default class AdminPage extends Component {
     render() {
         return (
-            <Admin />
+            <UploadComponent />
         )
     }
 }

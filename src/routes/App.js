@@ -10,7 +10,7 @@ function isActive(to, path) {
     return to === path;
 }
 
-class App extends Component {
+export default class App extends Component {
     render() {
         const {
             location: { pathname },
@@ -46,5 +46,3 @@ class App extends Component {
         );
     }
 }
-
-export default App;

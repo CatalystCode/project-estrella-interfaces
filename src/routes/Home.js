@@ -10,6 +10,9 @@ export default class Home extends Component {
                     <img src={logo} className="home-logo" alt="logo" />
                     <h2>Welcome!</h2>
                 </div>
+                <p className="home-intro">
+                    Project-Estrella goal is to operationalize the execution of parameterized <code>R</code> modules.
+                </p>
             </div>
         );
     }
