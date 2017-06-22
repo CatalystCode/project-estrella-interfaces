@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import TextField from 'react-md/lib/TextFields';
+import Button from 'react-md/lib/Buttons/Button';
 import request from 'request';
 import ModelInput from './ModelInput';
 
@@ -10,8 +12,19 @@ export default class User extends Component {
             model_name: '',
             model_intervals: 0,
             model_arguments: [],
-            url: ''
+            url: '',
+            query: {}
         };
+        this.queryModelInfo = this.queryModelInfo.bind(this);
+    }
+
+    handleChange(name, value) {
+        this.state.query[name] = value;
+    }
+
+    handleSubmit() {
+        let requestUrl = process.env.REACT_APP_SERVICE_HOST + "/api/model?model_name=" + this.state.query.model_name + "&model_group=" + this.state.query.model_group;
+        this.queryModelInfo(requestUrl);
     }
 
     componentWillUpdate(nextProps, nextState) {
@@ -25,7 +38,11 @@ export default class User extends Component {
             return;
         }
 
-        request(requestUrl, function (error, response, body) {
+        this.queryModelInfo(requestUrl);
+    }
+
+    queryModelInfo(url) {
+        request(url, function (error, response, body) {
             if (response && response.statusCode == 200) {
                 var json = JSON.parse(body);
                 var model_group = json['model_group'];
@@ -39,36 +56,56 @@ export default class User extends Component {
                     }
                 }
 
-                this.state = {
+                this.setState({
                     'model_group': model_group,
                     'model_name': model_name,
                     'model_intervals': model_intervals,
                     'model_arguments': model_arguments,
-                    'url': requestUrl
-                };
-
-                this.forceUpdate();
+                    'url': url
+                });
             }
             else {
-                this.state = {
+                this.setState({
                     model_group: '',
                     model_name: '',
                     model_intervals: 0,
                     model_arguments: [],
                     url: ''
-                };
+                });
             }
         }.bind(this));
     }
 
     render() {
+        let query;
+        if (!this.state.model_group) {
+            query = (
+                <div className="md-divider-border md-divider-border--below">
+                    <TextField id="model_group" placeholder="Model group" className="md-cell md-cell--bottom" onChange={this.handleChange.bind(this, 'model_group')} />
+                    <TextField id="model_name" placeholder="Model name" className="md-cell md-cell--bottom" onChange={this.handleChange.bind(this, 'model_name')} />
+                    <br />
+                    <p>
+                        <Button className="md-cell md-cell--bottom" raised onClick={this.handleSubmit.bind(this)} label="Submit" />
+                    </p>
+                </div>
+            );
+        }
+        else {
+            query = (
+                <div />
+            )
+        }
+
         return (
-            <ModelInput
-                model_group={this.state.model_group}
-                model_name={this.state.model_name}
-                model_intervals={this.state.model_intervals}
-                model_arguments={this.state.model_arguments}
-            />
+            <div>
+                <ModelInput
+                    model_group={this.state.model_group}
+                    model_name={this.state.model_name}
+                    model_intervals={this.state.model_intervals}
+                    model_arguments={this.state.model_arguments}
+                />
+                {query}
+            </div>
         )
     }
 }
