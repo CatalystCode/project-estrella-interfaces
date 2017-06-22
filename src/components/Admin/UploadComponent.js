@@ -14,11 +14,7 @@ const djsConfig = {
 const componentConfig = {
     iconFiletypes: ['.bin', '.txt', '.json'],
     showFiletypeIcon: true,
-<<<<<<< HEAD
-    postUrl: process.env.REACT_APP_SERVICE_HOST
-=======
-    postUrl: `${process.env.REACT_APP_SERVICE_HOST + '/api/model'}`
->>>>>>> e9caebb40e198a016238a31f6a5cff567edb608b
+	postUrl: `${process.env.REACT_APP_SERVICE_HOST + '/api/model'}`
 };
 
 const styles = {
