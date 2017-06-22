@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import TextField from 'react-md/lib/TextFields';
+import Button from 'react-md/lib/Buttons/Button';
 import request from 'request';
 import PredictionResult from './PredictionResult';
 
@@ -23,8 +25,7 @@ export default class ModelInput extends Component {
         };
     }
 
-    handleChange(type, event) {
-        var value = event.target.value;
+    handleChange(type, key, value) {
         if (type == "integer" || type == "long") {
             value = parseInt(value);
         }
@@ -32,7 +33,7 @@ export default class ModelInput extends Component {
             value = parseFloat(value);
         }
         let { input } = this.state;
-        input.model_arguments[event.target.name] = value;
+        input.model_arguments[key] = value;
         this.setState({ input });
         this.refs.model_arguments.value = JSON.stringify(input.model_arguments);
     }
@@ -65,15 +66,20 @@ export default class ModelInput extends Component {
     render() {
         return (
             this.props.model_group ?
-                <div>
+                <div className="md-divider-border md-divider-border--below">
                     <form onSubmit={this.handleSubmit.bind(this)}>
-                        <p>Model group:<input name="model_group" type="text" value={this.props.model_group} disabled /></p>
-                        <p>Model name:<input name="model_name" type="text" value={this.props.model_name} disabled /></p>
-                        <p>Model intervals:<input name="model_intervals" type="number" value={this.props.model_intervals} disabled /></p>
-                        <p>Model arguments:</p>
-                        {this.props.model_arguments.map(arg => (<p>{arg.key}<input name={arg.key} type={arg.value == "string" ? "text" : "number"} onChange={this.handleChange.bind(this, arg.value)}></input></p>))}
-                        <input ref="model_arguments" name="model_arguments" type="hidden" />
-                        <input type="submit" value="Submit" />
+                        <TextField id="model_group" label="Model group" value={this.props.model_group} locked />
+                        <TextField id="model_name" label="Model name" value={this.props.model_name} locked />
+                        <TextField id="model_intervals" label="Model intervals" value={this.props.model_intervals} locked />
+                        <br />
+                        <p>
+                            <h4 className="md-cell md-cell--bottom">
+                                Model Arguments
+                            </h4>
+                            {this.props.model_arguments.map(arg => (<TextField label={arg.key} name={arg.key} type={arg.value == "string" ? "text" : "number"} onChange={this.handleChange.bind(this, arg.key, arg.value)} />))}
+                            <input ref="model_arguments" name="model_arguments" type="hidden" /><br />
+                            <Button raised type="submit" label="Submit" />
+                        </p>
                     </form><br />
                     <PredictionResult url={this.state.url} />
                 </div> :

@@ -6,8 +6,10 @@
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-dropzone-component": "^2.0.0",
+    "react-md": "*",
     "react-router": "^3.0.0",
-    "request": "^2.81.0"
+    "request": "^2.81.0",
+	"webfontloader": "^1.6.27"
   },
   "devDependencies": {
     "react-scripts": "0.9.5"

@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import TextField from 'react-md/lib/TextFields';
+import Button from 'react-md/lib/Buttons/Button';
 import DropzoneComponent from 'react-dropzone-component';
 import '../../styles/UploadComponent.css';
 import 'dropzone/dist/min/dropzone.min.css';
@@ -33,22 +35,22 @@ export default class UploadComponent extends Component {
         };
     }
 
-    handleChange(name, event) {
-        this.state.metadata[name] = event.target.value;
+    handleChange(name, value) {
+        this.state.metadata[name] = value;
     }
 
-    addArgument(name, event) {
+    addArgument() {
         this.state.model_arguments.push({ 'name': '', 'type': '' });
         this.forceUpdate();
     }
 
-    removeArgument(name, event) {
+    removeArgument() {
         this.state.model_arguments.pop();
         this.forceUpdate();
     }
 
-    updateArgument(id, name, event) {
-        this.state.model_arguments[id][name] = event.target.value;
+    updateArgument(id, name, value) {
+        this.state.model_arguments[id][name] = value;
     }
 
     fileAdded(file) {
@@ -120,22 +122,22 @@ export default class UploadComponent extends Component {
         let modelParams;
         if (this.state.model_arguments.length == 0) {
             modelParams = (
-                <p>
-                    Model parameters<button type="button" onClick={this.addArgument.bind(this)}>Add</button><br />
-                </p>
+                <Button className="md-cell md-cell--bottom" raised onClick={this.addArgument.bind(this)} label="Add" />
             )
         }
         else {
             modelParams = (
                 <p>
-                    Model parameters<br />
                     {this.state.model_arguments.map((arg, id) => (
-                        <div>
-                            Name<input name={arg.name} type={"text"} onChange={this.updateArgument.bind(this, id, 'name')}></input>
-                            Type<input name={arg.type} type={"text"} onChange={this.updateArgument.bind(this, id, 'type')}></input>
-                        </div>))}
-                    <button type="button" onClick={this.addArgument.bind(this)}>Add</button>
-                    <button type="button" onClick={this.removeArgument.bind(this)}>Remove</button>
+                        <div className="md-grid">
+                            <TextField className="md-cell md-cell--bottom" placeholder="Name" name={arg.name} onChange={this.updateArgument.bind(this, id, 'name')} />
+                            <TextField className="md-cell md-cell--bottom" placeholder="Type" name={arg.type} onChange={this.updateArgument.bind(this, id, 'type')} />
+                        </div>
+                    ))}
+                    <p>
+                        <Button className="md-cell md-cell--bottom" raised onClick={this.addArgument.bind(this)} label="Add" />
+                        <Button className="md-cell md-cell--bottom" raised onClick={this.removeArgument.bind(this)} label="Remove" />
+                    </p>
                 </p>
             )
         }
@@ -147,19 +149,23 @@ export default class UploadComponent extends Component {
                         eventHandlers={eventHandlers}
                         djsConfig={djsConfig} />
                 </div>
-                Model group: <input type="text" name="model_group" value={this.state.metadata.model_group} onChange={this.handleChange.bind(this, 'model_group')} /><br />
-                Model name: <input type="text" name="model_name" value={this.state.metadata.model_name} onChange={this.handleChange.bind(this, 'model_name')} /><br />
-                Model intervals: <input type="number" name="model_intervals" value={this.state.metadata.model_intervals} onChange={this.handleChange.bind(this, 'model_intervals')} /><br />
-                Model frequency: <input type="text" name="model_frequency" value={this.state.metadata.model_frequency} onChange={this.handleChange.bind(this, 'model_frequency')} /><br />
-                {modelParams}
-                <div className="col-lg-12 text-left">
-                    <div className="row" style={styles.button}>
-                        <button type="button" onClick={this.handleUpload.bind(this)} className={className + " btn"}>
-                            {action === 'processing' ? <i className="fa fa-spinner fa-spin fa-fw"></i> : null}
-                            {message} &nbsp;
-                    </button>
-                    </div>
+                <div className="md-grid">
+                    <TextField id="model_group" placeholder="Model group" className="md-cell md-cell--bottom" onChange={this.handleChange.bind(this, 'model_group')} />
+                    <TextField id="model_name" placeholder="Model name" className="md-cell md-cell--bottom" onChange={this.handleChange.bind(this, 'model_name')} />
+                    <TextField id="model_intervals" type="number" placeholder="Model intervals" className="md-cell md-cell--bottom" onChange={this.handleChange.bind(this, 'model_intervals')} />
+                    <TextField id="model_frequency" placeholder="Model frequency" className="md-cell md-cell--bottom" onChange={this.handleChange.bind(this, 'model_frequency')} />
+                    <br />
                 </div>
+                <p>
+                    <h4 className="md-cell md-cell--bottom">
+                        Model Parameters
+                    </h4>
+                    {modelParams}
+                </p>
+                <br /><br /><br />
+                <p>
+                    <Button className="md-cell md-cell--bottom" raised onClick={this.handleUpload.bind(this)} label={message} />
+                </p>
             </div>
         );
     }

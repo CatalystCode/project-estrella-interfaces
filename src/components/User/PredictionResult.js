@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import TextField from 'react-md/lib/TextFields';
+import Button from 'react-md/lib/Buttons/Button';
 import request from 'request';
 
 export default class PredictionResult extends Component {
@@ -38,8 +40,8 @@ export default class PredictionResult extends Component {
         return (
             this.props.url ?
                 <div>
-                    URL:<input type="text" value={this.props.url} size="100" disabled />
-                    <button type="button" onClick={this.queryPrediction.bind(this)}>Query</button><br />
+                    <TextField label="URL" value={this.props.url} size="100" locked />
+                    <Button raised label="Query" onClick={this.queryPrediction.bind(this)} /><br /><br />
                     <p>
                         {prediction}
                     </p>
