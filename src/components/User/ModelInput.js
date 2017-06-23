@@ -9,6 +9,7 @@ export default class ModelInput extends Component {
         super(props);
         this.state = {
             'input': '',
+            'current_interval': '',
             'url': ''
         };
     }
@@ -21,11 +22,16 @@ export default class ModelInput extends Component {
         input.model_arguments = {};
         this.state = {
             'input': input,
+            'current_interval': prevState.current_interval,
             'url': prevState.url
         };
     }
 
-    handleChange(type, key, value) {
+    handleIntervalChange(value) {
+        this.state.current_interval = value;
+    }
+
+    handleArgumentChange(type, key, value) {
         if (type == "integer" || type == "long") {
             value = parseInt(value);
         }
@@ -40,6 +46,9 @@ export default class ModelInput extends Component {
 
     handleSubmit(event) {
         event.preventDefault();
+        if (this.state.current_interval) {
+            this.state.input.model_interval = this.state.current_interval;
+        }
         request({
             method: "POST",
             uri: process.env.REACT_APP_SERVICE_HOST + '/api/prediction',
@@ -74,9 +83,10 @@ export default class ModelInput extends Component {
                         <br />
                         <p>
                             <h4 className="md-cell md-cell--bottom">
-                                Model Arguments
+                                Model Parameters
                             </h4>
-                            {this.props.model_arguments.map(arg => (<TextField label={arg.key} name={arg.key} type={arg.value == "string" ? "text" : "number"} onChange={this.handleChange.bind(this, arg.key, arg.value)} />))}
+                            <TextField id="current_interval" label="Current interval" onChange={this.handleIntervalChange.bind(this)} />
+                            {this.props.model_arguments.map(arg => (<TextField label={arg.key} name={arg.key} type={arg.value == "string" ? "text" : "number"} onChange={this.handleArgumentChange.bind(this, arg.key, arg.value)} />))}
                             <input ref="model_arguments" name="model_arguments" type="hidden" /><br />
                             <Button raised type="submit" label="Submit" />
                         </p>
