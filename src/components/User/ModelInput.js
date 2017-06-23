@@ -8,22 +8,28 @@ export default class ModelInput extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            'input': '',
+            'input':
+            {
+                'model_group': '',
+                'model_name': '',
+                'model_interval': 0,
+                'model_arguments': {}
+            },
             'current_interval': '',
             'url': ''
         };
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentWillReceiveProps(props) {
         let input = {};
-        input.model_group = prevProps.model_group;
-        input.model_name = prevProps.model_name;
-        input.model_interval = prevProps.model_intervals;
+        input.model_group = props.model_group;
+        input.model_name = props.model_name;
+        input.model_interval = props.model_intervals;
         input.model_arguments = {};
         this.state = {
             'input': input,
-            'current_interval': prevState.current_interval,
-            'url': prevState.url
+            'current_interval': 0,
+            'url': ''
         };
     }
 
@@ -86,7 +92,16 @@ export default class ModelInput extends Component {
                                 Model Parameters
                             </h4>
                             <TextField id="current_interval" label="Current interval" onChange={this.handleIntervalChange.bind(this)} />
-                            {this.props.model_arguments.map(arg => (<TextField label={arg.key} name={arg.key} type={arg.value == "string" ? "text" : "number"} onChange={this.handleArgumentChange.bind(this, arg.key, arg.value)} />))}
+                            {
+                                this.props.model_arguments.map(arg => (
+                                    <TextField
+                                        label={arg.key}
+                                        name={arg.key}
+                                        type={arg.value == "string" ? "text" : "number"}
+                                        onChange={this.handleArgumentChange.bind(this, arg.value, arg.key)}
+                                        value={this.state.input.model_arguments[arg.key] ? this.state.input.model_arguments[arg.key] : ""}
+                                    />))
+                            }
                             <input ref="model_arguments" name="model_arguments" type="hidden" /><br />
                             <Button raised type="submit" label="Submit" />
                         </p>
