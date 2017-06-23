@@ -9,8 +9,7 @@
     "react-md": "*",
     "react-router": "^3.0.0",
     "request": "^2.81.0",
-	  "webfontloader": "^1.6.27",
-    "react-scripts": "0.9.5"
+	  "webfontloader": "^1.6.27"
   },
   "devDependencies": {
     "react-scripts": "0.9.5"
