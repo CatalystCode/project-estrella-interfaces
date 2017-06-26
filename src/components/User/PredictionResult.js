@@ -39,9 +39,9 @@ export default class PredictionResult extends Component {
 
         return (
             this.props.url ?
-                <div>
-                    <TextField label="URL" value={this.props.url} size="100" locked />
-                    <Button raised label="Query" onClick={this.queryPrediction.bind(this)} /><br /><br />
+                <div className="md-divider-border md-divider-border--below">
+                    <TextField className="md-cell md-cell--bottom" label="URL" value={this.props.url} size="100" locked />
+                    <Button className="md-cell md-cell--bottom" raised label="Query" onClick={this.queryPrediction.bind(this)} /><br /><br />
                     <p>
                         {prediction}
                     </p>

@@ -3,6 +3,7 @@ import TextField from 'react-md/lib/TextFields';
 import Button from 'react-md/lib/Buttons/Button';
 import request from 'request';
 import ModelInput from './ModelInput';
+import PredictionChart from './PredictionChart';
 
 export default class User extends Component {
     constructor(props) {
@@ -13,7 +14,8 @@ export default class User extends Component {
             model_intervals: 0,
             model_arguments: [],
             url: '',
-            query: {}
+            query: {},
+            chartData: []
         };
         this.queryModelInfo = this.queryModelInfo.bind(this);
     }
@@ -23,8 +25,7 @@ export default class User extends Component {
     }
 
     handleSubmit() {
-        let requestUrl = process.env.REACT_APP_SERVICE_HOST + "/api/model?model_name=" + this.state.query.model_name + "&model_group=" + this.state.query.model_group;
-        this.queryModelInfo(requestUrl);
+        this.queryModelInfo(this.state.query.model_name, this.state.query.model_group);
     }
 
     componentWillUpdate(nextProps, nextState) {
@@ -33,16 +34,17 @@ export default class User extends Component {
             return;
         }
 
-        let requestUrl = process.env.REACT_APP_SERVICE_HOST + "/api/model?model_name=" + query.model_name + "&model_group=" + query.model_group;
-        if (requestUrl === this.state.url) {
+        let url = process.env.REACT_APP_SERVICE_HOST + "/api/model?model_name=" + query.model_name + "&model_group=" + query.model_group;
+        if (url === this.state.url) {
             return;
         }
 
-        this.queryModelInfo(requestUrl);
+        this.queryModelInfo(query.model_name, query.model_group);
     }
 
-    queryModelInfo(url) {
-        request(url, function (error, response, body) {
+    queryModelInfo(modelName, modelGroup) {
+        let modelUrl = process.env.REACT_APP_SERVICE_HOST + "/api/model?model_name=" + modelName + "&model_group=" + modelGroup;
+        request(modelUrl, function (error, response, body) {
             if (response && response.statusCode == 200) {
                 var json = JSON.parse(body);
                 var model_group = json['model_group'];
@@ -61,8 +63,24 @@ export default class User extends Component {
                     'model_name': model_name,
                     'model_intervals': model_intervals,
                     'model_arguments': model_arguments,
-                    'url': url
+                    'url': modelUrl
                 });
+
+                let predictionUrl = process.env.REACT_APP_SERVICE_HOST + "/api/prediction?model_name=" + modelName + "&model_group=" + modelGroup;
+                request(predictionUrl, function (error, response, body) {
+                    if (response && response.statusCode == 200) {
+                        let predictionDataArray = JSON.parse(body);
+                        var chartDataArray = [];
+                        predictionDataArray.map(data => {
+                            let chartData = {
+                                'interval': data.model_interval,
+                                'prediction': data.model_prediction
+                            }
+                            chartDataArray.push(chartData);
+                        });
+                        this.setState({ 'chartData': chartDataArray });
+                    }
+                }.bind(this));
             }
             else {
                 this.setState({
@@ -90,22 +108,32 @@ export default class User extends Component {
                 </div>
             );
         }
-        else {
-            query = (
-                <div />
-            )
+
+        let chart;
+        if (this.state.chartData.length != 0) {
+            chart = (
+                <PredictionChart data={this.state.chartData} />
+            );
         }
 
+        var tdStyle = { 'vertical-align': 'top' };
         return (
-            <div>
-                <ModelInput
-                    model_group={this.state.model_group}
-                    model_name={this.state.model_name}
-                    model_intervals={this.state.model_intervals}
-                    model_arguments={this.state.model_arguments}
-                />
-                {query}
-            </div>
+            <table width="100%" border="0">
+                <tr>
+                    <td width="50%">
+                        <ModelInput
+                            model_group={this.state.model_group}
+                            model_name={this.state.model_name}
+                            model_intervals={this.state.model_intervals}
+                            model_arguments={this.state.model_arguments}
+                        />
+                        {query}
+                    </td>
+                    <td style={tdStyle}>
+                        {chart}
+                    </td>
+                </tr>
+            </table>
         )
     }
 }

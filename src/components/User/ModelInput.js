@@ -83,18 +83,19 @@ export default class ModelInput extends Component {
             this.props.model_group ?
                 <div className="md-divider-border md-divider-border--below">
                     <form onSubmit={this.handleSubmit.bind(this)}>
-                        <TextField id="model_group" label="Model group" value={this.props.model_group} locked />
-                        <TextField id="model_name" label="Model name" value={this.props.model_name} locked />
-                        <TextField id="model_intervals" label="Model intervals" value={this.props.model_intervals} locked />
+                        <TextField className="md-cell md-cell--bottom" id="model_group" label="Model group" value={this.props.model_group} locked />
+                        <TextField className="md-cell md-cell--bottom" id="model_name" label="Model name" value={this.props.model_name} locked />
+                        <TextField className="md-cell md-cell--bottom" id="model_intervals" label="Model intervals" value={this.props.model_intervals} locked />
                         <br />
                         <p>
                             <h4 className="md-cell md-cell--bottom">
                                 Model Parameters
                             </h4>
-                            <TextField id="current_interval" label="Current interval" onChange={this.handleIntervalChange.bind(this)} />
+                            <TextField className="md-cell md-cell--bottom" id="current_interval" label="Current interval" onChange={this.handleIntervalChange.bind(this)} />
                             {
                                 this.props.model_arguments.map(arg => (
                                     <TextField
+                                        className="md-cell md-cell--bottom"
                                         label={arg.key}
                                         name={arg.key}
                                         type={arg.value == "string" ? "text" : "number"}
@@ -103,7 +104,7 @@ export default class ModelInput extends Component {
                                     />))
                             }
                             <input ref="model_arguments" name="model_arguments" type="hidden" /><br />
-                            <Button raised type="submit" label="Submit" />
+                            <Button className="md-cell md-cell--bottom" raised type="submit" label="Submit" />
                         </p>
                     </form><br />
                     <PredictionResult url={this.state.url} />
